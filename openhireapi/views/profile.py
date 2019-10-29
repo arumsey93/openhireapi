@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from openhireapi.models import Profile
+from django.contrib.auth.models import User
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for profile
@@ -17,6 +18,7 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
             lookup_field='id'
         )
         fields = ('id', 'url', 'user', 'city', 'state', 'linkedin', 'github', 'resume', 'portfolio', 'codingchallenge')
+        depth=1
 
 
 class Profiles(ViewSet):
@@ -28,7 +30,6 @@ class Profiles(ViewSet):
             Response -- JSON serialized Profile instance
         """
         new_profile = Profile()
-        user = Profile.objects.get(user=request.auth.user)
         new_profile.city = request.data["city"]
         new_profile.state = request.data["state"]
         new_profile.linkedin = request.data["linkedin"]
@@ -36,6 +37,8 @@ class Profiles(ViewSet):
         new_profile.resume = request.data["resume"]
         new_profile.portfolio = request.data["portfolio"]
         new_profile.codingchallenge = request.data["codingchallenge"]
+
+        user = Profile.objects.get(user=request.auth.user)
         new_profile.save()
 
         serializer = ProfileSerializer(new_profile, context={'request': request})
@@ -59,7 +62,11 @@ class Profiles(ViewSet):
         Returns:
             Response -- Empty body with 204 status code
         """
+
+        user = User.objects.get(pk=request.data["user_id"])
+
         profile = Profile.objects.get(pk=pk)
+
         profile.city = request.data["city"]
         profile.state = request.data["state"]
         profile.linkedin = request.data["linkedin"]
@@ -67,6 +74,14 @@ class Profiles(ViewSet):
         profile.resume = request.data["resume"]
         profile.portfolio = request.data["portfolio"]
         profile.codingchallenge = request.data["codingchallenge"]
+
+        user.first_name = request.data["first_name"]
+        user.last_name = request.data["last_name"]
+
+        user.save()
+
+        profile.user = user
+
         profile.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
@@ -94,11 +109,7 @@ class Profiles(ViewSet):
             Response -- JSON serialized list of profiles
         """
         profiles = Profile.objects.all()
-
-        # Support filtering attractions by profile id
-        profile = self.request.query_params.get('profile', None)
-        if profile is not None:
-            profiles = profiles.filter(profile__id=profile)
+        profiles = profiles.filter(linkedin__isnull=False, github__isnull=False, resume__isnull=False, portfolio__isnull=False, codingchallenge__isnull=False)
 
         serializer = ProfileSerializer(
             profiles, many=True, context={'request': request})

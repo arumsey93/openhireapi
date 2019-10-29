@@ -27,7 +27,8 @@ def login_user(request):
         # If authentication was successful, respond with their token
         if authenticated_user is not None:
             token = Token.objects.get(user=authenticated_user)
-            data = json.dumps({"valid": True, "token": token.key})
+            profile = Profile.objects.get(user=authenticated_user)
+            data = json.dumps({"valid": True, "token": token.key, "profile_id": profile.user_id})
             return HttpResponse(data, content_type='application/json')
 
         else:
@@ -58,6 +59,8 @@ def register_user(request):
 
     profile = Profile.objects.create(
         phone_number=req_body['phone_number'],
+        city=req_body['city'],
+        state=req_body['state'],
         user=new_user
     )
 
@@ -68,5 +71,5 @@ def register_user(request):
     token = Token.objects.create(user=new_user)
 
     # Return the token to the client
-    data = json.dumps({"token": token.key})
+    data = json.dumps({"token": token.key, "user_id": new_user.id})
     return HttpResponse(data, content_type='application/json')

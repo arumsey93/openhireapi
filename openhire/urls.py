@@ -8,6 +8,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'profiles', Profiles, 'profile')
 router.register(r'jobs', Jobs, 'job')
 router.register(r'favorites', Favorites, 'favorite')
+router.register(r'users', Users, 'user')
 
 
 urlpatterns = [

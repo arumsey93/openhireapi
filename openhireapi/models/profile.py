@@ -35,4 +35,4 @@ class Profile(models.Model):
     profile_image = models.ImageField(upload_to='openhire\openhireapi\profile_image')
 
     def __str__(self):
-        return "{} {}".format(self.first_name, self.last_name)
+        return f'(self.first_name, self.last_name)'

@@ -3,6 +3,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
+from django.contrib.auth.models import User
 from openhireapi.models import Job
 
 class JobSerializer(serializers.HyperlinkedModelSerializer):
@@ -16,7 +17,7 @@ class JobSerializer(serializers.HyperlinkedModelSerializer):
             view_name='profile',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'title', 'description', 'city', 'state', 'application')
+        fields = ('id', 'url', 'user', 'title', 'description', 'city', 'state', 'application')
 
 
 class Jobs(ViewSet):
@@ -33,6 +34,10 @@ class Jobs(ViewSet):
         new_job.linkedin = request.data["city"]
         new_job.github = request.data["state"]
         new_job.resume = request.data["application"]
+
+        user = Job.objects.get(user=request.auth.user)
+        new_job.user = user
+        
         new_job.save()
 
         serializer = JobSerializer(new_job, context={'request': request})
@@ -56,6 +61,10 @@ class Jobs(ViewSet):
         Returns:
             Response -- Empty body with 204 status code
         """
+
+        user = User.objects.get(pk=request.data["user_id"])
+        user.save()
+
         job = Job.objects.get(pk=pk)
         job.title = request.data["title"]
         job.description = request.data["description"]
@@ -91,9 +100,9 @@ class Jobs(ViewSet):
         jobs = Job.objects.all()
 
         # Support filtering attractions by profile id
-        job = self.request.query_params.get('job', None)
+        job = self.request.query_params.get('user', None)
         if job is not None:
-            jobs = jobs.filter(job__id=job)
+            jobs = jobs.filter(user__id=job)
 
         serializer = JobSerializer(
             jobs, many=True, context={'request': request})

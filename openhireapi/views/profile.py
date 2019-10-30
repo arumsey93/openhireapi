@@ -92,8 +92,26 @@ class Profiles(ViewSet):
             Response -- 200, 404, or 500 status code
         """
         try:
+            # user = User.objects.get(pk=request.data["user_id"])
+
             profile = Profile.objects.get(pk=pk)
-            profile.delete()
+
+            profile.city = None
+            profile.state = None
+            profile.linkedin = None
+            profile.github = None
+            profile.resume = None
+            profile.portfolio = None
+            profile.codingchallenge = None
+
+            # user.first_name = request.data["first_name"]
+            # user.last_name = request.data["last_name"]
+
+            # user.save()
+
+            # profile.user = user
+
+            profile.save()
 
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
@@ -109,7 +127,7 @@ class Profiles(ViewSet):
             Response -- JSON serialized list of profiles
         """
         profiles = Profile.objects.all()
-        profiles = profiles.filter(linkedin__isnull=False, github__isnull=False, resume__isnull=False, portfolio__isnull=False, codingchallenge__isnull=False)
+        # profiles = profiles.filter(linkedin__isnull=False, github__isnull=False, resume__isnull=False, portfolio__isnull=False, codingchallenge__isnull=False)
 
         serializer = ProfileSerializer(
             profiles, many=True, context={'request': request})

@@ -1,4 +1,9 @@
 from django.db import models
+from django.db.models import F
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 class Job(models.Model):
     '''
@@ -10,11 +15,12 @@ class Job(models.Model):
     created_at: date/time job was created
     '''
 
-    title = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000)
-    city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
-    application = models.CharField(max_length=50)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, null=True)
+    description = models.CharField(max_length=1000, null=True)
+    city = models.CharField(max_length=50, null=True)
+    state = models.CharField(max_length=50, null=True)
+    application = models.CharField(max_length=50, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

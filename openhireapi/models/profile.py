@@ -23,16 +23,16 @@ class Profile(models.Model):
     '''
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=50)
-    city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
-    linkedin = models.CharField(max_length=100)
-    github = models.CharField(max_length=100)
-    resume = models.CharField(max_length=100)
-    portfolio = models.CharField(max_length=100)
-    codingchallenge = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=50, null=True)
+    city = models.CharField(max_length=50, null=True)
+    state = models.CharField(max_length=50, null=True)
+    linkedin = models.CharField(max_length=100, null=True)
+    github = models.CharField(max_length=100, null=True)
+    resume = models.CharField(max_length=100, null=True)
+    portfolio = models.CharField(max_length=100, null=True)
+    codingchallenge = models.CharField(max_length=100, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    profile_image = models.ImageField(upload_to='openhire\openhireapi\profile_image')
+    profile_image = models.ImageField(upload_to='openhire\openhireapi\profile_image', null=True)
 
     def __str__(self):
         return f'(self.first_name, self.last_name)'

@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from django.contrib.auth.models import User
-from openhireapi.models import Job
+from openhireapi.models import Job, Profile
+
 
 class JobSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for job
@@ -17,7 +18,8 @@ class JobSerializer(serializers.HyperlinkedModelSerializer):
             view_name='profile',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'user', 'title', 'description', 'city', 'state', 'application')
+        fields = ('id', 'url', 'user', 'user_id', 'title', 'description', 'city', 'state', 'application')
+        depth=1
 
 
 class Jobs(ViewSet):
@@ -28,16 +30,16 @@ class Jobs(ViewSet):
         Returns:
             Response -- JSON serialized Profile instance
         """
-        new_job = Job()
-        new_job.city = request.data["title"]
-        new_job.state = request.data["description"]
-        new_job.linkedin = request.data["city"]
-        new_job.github = request.data["state"]
-        new_job.resume = request.data["application"]
 
-        user = Job.objects.get(user=request.auth.user)
+        new_job = Job()
+        new_job.title = request.data["title"]
+        new_job.description = request.data["description"]
+        new_job.city = request.data["city"]
+        new_job.state = request.data["state"]
+        new_job.application = request.data["application"]
+        user = request.auth.user
         new_job.user = user
-        
+
         new_job.save()
 
         serializer = JobSerializer(new_job, context={'request': request})

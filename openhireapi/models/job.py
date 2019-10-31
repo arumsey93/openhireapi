@@ -15,16 +15,16 @@ class Job(models.Model):
     created_at: date/time job was created
     '''
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, null=True)
     description = models.CharField(max_length=1000, null=True)
     city = models.CharField(max_length=50, null=True)
     state = models.CharField(max_length=50, null=True)
-    application = models.CharField(max_length=50, null=True)
+    application = models.CharField(max_length=100, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        verbose_name = ("Job")
-        verbose_name_plural =("Jobs")
+    # class Meta:
+    #     verbose_name = ("job")
+    #     verbose_name_plural =("jobs")
 
 

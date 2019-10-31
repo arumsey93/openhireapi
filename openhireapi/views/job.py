@@ -101,7 +101,7 @@ class Jobs(ViewSet):
         """
         jobs = Job.objects.all()
 
-        # Support filtering attractions by profile id
+        # Support filtering attractions by job id
         job = self.request.query_params.get('user', None)
         if job is not None:
             jobs = jobs.filter(user__id=job)

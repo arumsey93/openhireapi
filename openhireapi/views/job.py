@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from django.contrib.auth.models import User
-from openhireapi.models import Job
+from openhireapi.models import Job, Profile
+# from rest_framework.decorators import action
+
 
 class JobSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for job
@@ -17,7 +19,8 @@ class JobSerializer(serializers.HyperlinkedModelSerializer):
             view_name='profile',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'user', 'title', 'description', 'city', 'state', 'application')
+        fields = ('id', 'url', 'user', 'user_id', 'title', 'description', 'city', 'state', 'application')
+        depth=1
 
 
 class Jobs(ViewSet):
@@ -28,16 +31,16 @@ class Jobs(ViewSet):
         Returns:
             Response -- JSON serialized Profile instance
         """
-        new_job = Job()
-        new_job.city = request.data["title"]
-        new_job.state = request.data["description"]
-        new_job.linkedin = request.data["city"]
-        new_job.github = request.data["state"]
-        new_job.resume = request.data["application"]
 
-        user = Job.objects.get(user=request.auth.user)
+        new_job = Job()
+        new_job.title = request.data["title"]
+        new_job.description = request.data["description"]
+        new_job.city = request.data["city"]
+        new_job.state = request.data["state"]
+        new_job.application = request.data["application"]
+        user = request.auth.user
         new_job.user = user
-        
+
         new_job.save()
 
         serializer = JobSerializer(new_job, context={'request': request})
@@ -62,15 +65,14 @@ class Jobs(ViewSet):
             Response -- Empty body with 204 status code
         """
 
-        user = User.objects.get(pk=request.data["user_id"])
-        user.save()
-
         job = Job.objects.get(pk=pk)
         job.title = request.data["title"]
         job.description = request.data["description"]
         job.city = request.data["city"]
         job.state = request.data["state"]
         job.application = request.data["application"]
+        user =  request.auth.user
+        job.user = user
         job.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
@@ -99,11 +101,22 @@ class Jobs(ViewSet):
         """
         jobs = Job.objects.all()
 
-        # Support filtering attractions by profile id
+        # Support filtering jobs by user id
         job = self.request.query_params.get('user', None)
         if job is not None:
-            jobs = jobs.filter(user__id=job)
+            jobs = jobs.filter(user=request.user)
 
         serializer = JobSerializer(
             jobs, many=True, context={'request': request})
         return Response(serializer.data)
+
+    # @action(methods=['get'], detail=False)
+    # def current_job(self, request):
+    #     """Special action to get current user without having to know/send the user id from client"""
+
+    #     job = Job.objects.get(user=request.user)
+    #     serializer = JobSerializer(
+    #         job,
+    #         context={'request': request}
+    #     )
+    #     return Response(serializer.data)

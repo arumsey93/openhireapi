@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework import status
 from openhireapi.models import Profile
 from django.contrib.auth.models import User
+from rest_framework.decorators import action
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for profile
@@ -65,7 +66,7 @@ class Profiles(ViewSet):
 
         user = User.objects.get(pk=request.data["user_id"])
 
-        profile = Profile.objects.get(pk=pk)
+        profile = Profile.objects.get(user=request.user)
 
         profile.city = request.data["city"]
         profile.state = request.data["state"]
@@ -92,7 +93,6 @@ class Profiles(ViewSet):
             Response -- 200, 404, or 500 status code
         """
         try:
-            # user = User.objects.get(pk=request.data["user_id"])
 
             profile = Profile.objects.get(pk=pk)
 
@@ -103,13 +103,6 @@ class Profiles(ViewSet):
             profile.resume = None
             profile.portfolio = None
             profile.codingchallenge = None
-
-            # user.first_name = request.data["first_name"]
-            # user.last_name = request.data["last_name"]
-
-            # user.save()
-
-            # profile.user = user
 
             profile.save()
 
@@ -131,4 +124,15 @@ class Profiles(ViewSet):
 
         serializer = ProfileSerializer(
             profiles, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def current_profile(self, request):
+        """Special action to get current user without having to know/send the user id from client"""
+
+        profile = Profile.objects.get(user=request.user)
+        serializer = ProfileSerializer(
+            profile,
+            context={'request': request}
+        )
         return Response(serializer.data)

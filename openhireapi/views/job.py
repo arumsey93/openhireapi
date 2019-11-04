@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework import status
 from django.contrib.auth.models import User
 from openhireapi.models import Job, Profile
+# from rest_framework.decorators import action
 
 
 class JobSerializer(serializers.HyperlinkedModelSerializer):
@@ -64,15 +65,14 @@ class Jobs(ViewSet):
             Response -- Empty body with 204 status code
         """
 
-        user = User.objects.get(pk=request.data["user_id"])
-        user.save()
-
         job = Job.objects.get(pk=pk)
         job.title = request.data["title"]
         job.description = request.data["description"]
         job.city = request.data["city"]
         job.state = request.data["state"]
         job.application = request.data["application"]
+        user =  request.auth.user
+        job.user = user
         job.save()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
@@ -101,11 +101,22 @@ class Jobs(ViewSet):
         """
         jobs = Job.objects.all()
 
-        # Support filtering attractions by job id
+        # Support filtering jobs by user id
         job = self.request.query_params.get('user', None)
         if job is not None:
-            jobs = jobs.filter(user__id=job)
+            jobs = jobs.filter(user=request.user)
 
         serializer = JobSerializer(
             jobs, many=True, context={'request': request})
         return Response(serializer.data)
+
+    # @action(methods=['get'], detail=False)
+    # def current_job(self, request):
+    #     """Special action to get current user without having to know/send the user id from client"""
+
+    #     job = Job.objects.get(user=request.user)
+    #     serializer = JobSerializer(
+    #         job,
+    #         context={'request': request}
+    #     )
+    #     return Response(serializer.data)

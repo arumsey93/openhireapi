@@ -131,8 +131,6 @@ class Profiles(ViewSet):
         """Special action to get current user without having to know/send the user id from client"""
 
         profile = Profile.objects.get(user=request.user)
-        print("profile", profile)
-
         serializer = ProfileSerializer(
             profile,
             context={'request': request}

@@ -18,7 +18,7 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
             view_name='profile',
             lookup_field='id'
         )
-        fields = ('id', 'url', 'user', 'city', 'state', 'linkedin', 'github', 'resume', 'portfolio', 'codingchallenge')
+        fields = ('id', 'url', 'user', 'city', 'state', 'linkedin', 'github', 'resume', 'portfolio', 'codingchallenge', 'techOne', 'techTwo', 'techThree')
         depth=1
 
 
@@ -38,6 +38,9 @@ class Profiles(ViewSet):
         new_profile.resume = request.data["resume"]
         new_profile.portfolio = request.data["portfolio"]
         new_profile.codingchallenge = request.data["codingchallenge"]
+        new_profile.techOne = request.data["techOne"]
+        new_profile.techTwo = request.data["techTwo"]
+        new_profile.techThree = request.data["techThree"]
 
         user = Profile.objects.get(user=request.auth.user)
         new_profile.save()
@@ -75,6 +78,9 @@ class Profiles(ViewSet):
         profile.resume = request.data["resume"]
         profile.portfolio = request.data["portfolio"]
         profile.codingchallenge = request.data["codingchallenge"]
+        profile.techOne = request.data["techOne"]
+        profile.techTwo = request.data["techTwo"]
+        profile.techThree = request.data["techThree"]
 
         user.first_name = request.data["first_name"]
         user.last_name = request.data["last_name"]
@@ -103,6 +109,9 @@ class Profiles(ViewSet):
             profile.resume = None
             profile.portfolio = None
             profile.codingchallenge = None
+            profile.techOne = None
+            profile.techTwo = None
+            profile.techThree = None
 
             profile.save()
 

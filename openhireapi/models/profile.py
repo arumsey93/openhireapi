@@ -31,6 +31,9 @@ class Profile(models.Model):
     resume = models.CharField(max_length=100, null=True)
     portfolio = models.CharField(max_length=100, null=True)
     codingchallenge = models.CharField(max_length=100, null=True)
+    techOne = models.CharField(max_length=50, null=True)
+    techTwo = models.CharField(max_length=50, null=True)
+    techThree = models.CharField(max_length=50, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     profile_image = models.ImageField(upload_to='openhire\openhireapi\profile_image', null=True)
 

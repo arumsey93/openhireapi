@@ -97,14 +97,23 @@ class Jobs(ViewSet):
     def list(self, request):
         """Handle GET requests to profile
         Returns:
-            Response -- JSON serialized list of profiles
+            Response -- JSON serialized list of jobs
         """
         jobs = Job.objects.all()
+
+        city = self.request.query_params.get('city', None)
+        state = self.request.query_params.get('state', None)
 
         # Support filtering jobs by user id
         job = self.request.query_params.get('user', None)
         if job is not None:
             jobs = jobs.filter(user=request.user)
+
+        if city is not None:
+            jobs = jobs.filter(city=city)
+
+        if state is not None:
+            jobs = jobs.filter(state=state)
 
         serializer = JobSerializer(
             jobs, many=True, context={'request': request})

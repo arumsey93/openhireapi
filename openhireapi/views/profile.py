@@ -6,6 +6,7 @@ from rest_framework import status
 from openhireapi.models import Profile
 from django.contrib.auth.models import User
 from rest_framework.decorators import action
+from django.db.models import Q
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for profile
@@ -129,7 +130,19 @@ class Profiles(ViewSet):
             Response -- JSON serialized list of profiles
         """
         profiles = Profile.objects.all()
-        # profiles = profiles.filter(linkedin__isnull=False, github__isnull=False, resume__isnull=False, portfolio__isnull=False, codingchallenge__isnull=False)
+
+        city = self.request.query_params.get('city', None)
+        state = self.request.query_params.get('state', None)
+        tech = self.request.query_params.get('tech', None)
+
+        if city is not None:
+            profiles = profiles.filter(city=city)
+
+        if state is not None:
+            profiles = profiles.filter(state=state)
+
+        if tech is not None:
+            profiles = profiles.filter(Q(techOne__startswith=tech)|Q(techTwo__startswith=tech)|Q(techThree__startswith=tech))
 
         serializer = ProfileSerializer(
             profiles, many=True, context={'request': request})

@@ -68,7 +68,6 @@ The database requires an authorization token in the Headers to succesfully reque
 Now you may GET, POST, PUT, and DELETE to any of the following resources:
 * /Profile
 * /Job
-* /Favorite
 
 ### Authors
 

@@ -5,7 +5,6 @@ from rest_framework import serializers
 from rest_framework import status
 from django.contrib.auth.models import User
 from openhireapi.models import Job, Profile
-# from rest_framework.decorators import action
 
 
 class JobSerializer(serializers.HyperlinkedModelSerializer):
@@ -118,14 +117,3 @@ class Jobs(ViewSet):
         serializer = JobSerializer(
             jobs, many=True, context={'request': request})
         return Response(serializer.data)
-
-    # @action(methods=['get'], detail=False)
-    # def current_job(self, request):
-    #     """Special action to get current user without having to know/send the user id from client"""
-
-    #     job = Job.objects.get(user=request.user)
-    #     serializer = JobSerializer(
-    #         job,
-    #         context={'request': request}
-    #     )
-    #     return Response(serializer.data)
